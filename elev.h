@@ -123,5 +123,20 @@ void set_elevator_lamps(void);
 
 void waitFor(int secs);
 
+// setter heisen i startposisjon
+void init_elevator(void);
+
+// Stop elevator and exit program if the stop button is pressed
+void checkStop(void);
+
+void delay(int number_of_seconds);
+
+int check_last_floor();
+
+int set_direction();
+
+int check_order(int floor);
+
+
 
 #endif // #ifndef __INCLUDE_DRIVER_H__

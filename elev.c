@@ -147,7 +147,7 @@ void elev_set_button_lamp(elev_button_type_t button, int floor, int value) {
 }
 void set_elevator_lamps(void) {
 	for (int i = 0; i < N_FLOORS; i++) {
-		for (int j = 0; j <= BUTTON_COMMAND; j++) {
+		for (int j = 0; j < BUTTON_COMMAND+1; j++) {
 		if ((i == 0 && j == 1) || (i == 3 && j == 0)) {
 			break;
                    }
@@ -165,6 +165,71 @@ void set_elevator_lamps(void) {
 } 
 
 void waitFor(int secs){
-	int retTime = time(0) + secs;
-	while (time(0) < retTime);
+	int msec = 0;
+    clock_t before = clock();
+    do {
+        //holder funksjonen opptatt i "secs" sekunder
+        clock_t difference = clock() - before;
+        msec = difference*1000/CLOCKS_PER_SEC;
+    } while (msec < secs);
 }
+
+void init_elevator(void) {
+    while(elev_get_floor_sensor_signal() == -1) {
+        elev_set_motor_direction(DIRN_UP);  
+    }
+    elev_set_motor_direction(DIRN_STOP);
+}
+
+
+
+void delay(int number_of_seconds){
+    clock_t start_time = clock();
+    while ( (clock() - start_time)/CLOCKS_PER_SEC < number_of_seconds){
+        set_elevator_lamps();
+        if (elev_get_stop_signal()){
+            break;
+        }
+    }
+}
+
+int check_order(int floor){
+    int stop = 0;
+    for (int j = 0; j <= BUTTON_COMMAND; j++) {
+        if ((floor == 0 && j == 1) || (floor == 3 && j == 0)) {
+            break;
+        }
+        else if (elev_get_button_signal(j, floor) == 1 ){
+            stop = 1; 
+        }
+    }
+    return stop;
+}
+
+int check_last_floor(){
+    static int last_floor = -1;
+    if (elev_get_floor_sensor_signal() != -1){
+        last_floor = elev_get_floor_sensor_signal();
+    }
+    return last_floor;
+}
+
+int set_direction(){
+    int order_floor = -1;
+    for (int i = 0; i < N_FLOORS; i++){
+        if (check_order(i)){
+            order_floor = i;
+            break;
+        }
+    }
+    if (order_floor == -1 || order_floor == check_last_floor()){
+        return 0;
+    } else if ( (check_last_floor() < order_floor) ){
+        return 1;
+    }
+    else if ( (check_last_floor() > order_floor)  ){
+        return -1;
+    }
+}
+
+

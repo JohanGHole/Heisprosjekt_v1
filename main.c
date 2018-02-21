@@ -1,7 +1,9 @@
 #include "elev.h"
 #include <stdio.h>
+#include <unistd.h>
 
 int dir = DIRN_UP;
+int infloor = -1; 
 
 int main() {
     // Initialize hardware
@@ -12,33 +14,49 @@ int main() {
 
     printf("Press STOP button to stop elevator and exit program.\n");
 
-    elev_set_motor_direction(DIRN_UP);
-
+    init_elevator();
     while (1) {
-	set_elevator_lamps();
-        // Change direction when we reach top/bottom floor
-        if (elev_get_floor_sensor_signal() == N_FLOORS - 1) {
-            elev_set_motor_direction(DIRN_STOP);
+		set_elevator_lamps();
+        // Change direction when we reach top/bottom floor, stop for 3 seconds in each floor
+        if ( (elev_get_floor_sensor_signal() == N_FLOORS - 1)  && ((check_last_floor() == 2) || (check_last_floor() == -1)) ) {
             elev_set_floor_indicator(3);
-	    dir = DIRN_DOWN;
-	    waitFor(3);
-	    elev_set_motor_direction(DIRN_DOWN);
-        } else if (elev_get_floor_sensor_signal() == 2) {
+            if (check_order(3) == 1){
+            	elev_set_motor_direction(DIRN_STOP);
+            	delay(3);
+            }
+            elev_set_motor_direction(set_direction());
+
+
+        } else if ( (elev_get_floor_sensor_signal() == 2) && ((check_last_floor() == 3 || check_last_floor() == 1)) ) {
             elev_set_floor_indicator(2);
-        } else if (elev_get_floor_sensor_signal() == 1) {
+            if (check_order(2) == 1){
+            	elev_set_motor_direction(DIRN_STOP);
+            	delay(3);
+            }
+            elev_set_motor_direction(set_direction());
+        } else if ( (elev_get_floor_sensor_signal() == 1) && ((check_last_floor() == 2 || check_last_floor() == 0)) ) {
             elev_set_floor_indicator(1);
-	} else if (elev_get_floor_sensor_signal() == 0) {
-            elev_set_motor_direction(DIRN_UP);
+           if (check_order(1) == 1){
+            	elev_set_motor_direction(DIRN_STOP);
+            	delay(3);
+            }
+            set_direction();		
+		} else if (elev_get_floor_sensor_signal() == 0 && check_last_floor() == 1) {
             elev_set_floor_indicator(0);
-	    dir = DIRN_UP;
+            if (check_order(0) == 1){
+            	elev_set_motor_direction(DIRN_STOP);
+            	delay(3);
+	    	}
+	    	elev_set_motor_direction(set_direction());		
         }
 
-        // Stop elevator and exit program if the stop button is pressed
         if (elev_get_stop_signal()) {
-	    elev_set_stop_lamp(1);
+            elev_set_stop_lamp(1);
             elev_set_motor_direction(DIRN_STOP);
             break;
         }
+
+    
     }
 
     return 0;
