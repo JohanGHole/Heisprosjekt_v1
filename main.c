@@ -16,7 +16,6 @@ int main() {
 
     init_elevator();
     while (1) {
-		set_elevator_lamps();
         // Change direction when we reach top/bottom floor, stop for 3 seconds in each floor
         if ( (elev_get_floor_sensor_signal() == N_FLOORS - 1)  && ((check_last_floor() == 2) || (check_last_floor() == -1)) ) {
             elev_set_floor_indicator(3);
