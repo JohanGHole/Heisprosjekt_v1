@@ -1,14 +1,13 @@
-#ifndef __FSM_H__
-#define __FSM_H__
+#ifndef _INCLUDE_FSM_H_
+#define _INCLUDE_FSM_H_
 // Headerfil til tilstandsmaskinen
 
 
 
-void init_elevator(void);
+void init_elevator();
 
 void elevator_control();
 
 void arrived_floor();
 
-
-#endif 
+#endif

@@ -3,22 +3,13 @@
 #include "fsm.h"
 #include "logic.h"
 #include "elev.h"
-#include "stdio.h"
+#include <stdio.h>
 
-void init_elevator() {
-    printf("Kom inn i init");
-    while(elev_get_floor_sensor_signal() == -1) {
-        elev_set_motor_direction(DIRN_UP);
-
-    }
-    elev_set_motor_direction(DIRN_STOP);
-    set_current_floor(elev_get_floor_sensor_signal() );
-    set_current_dir(DIRN_STOP);
-    set_last_dir(DIRN_UP);
-}
+#include "channels.h"
+#include "io.h"
 
 
-void elevator_control(){
+/*void elevator_control(){
     check_order();
     set_priority();
     if(get_next_floor()== get_current_floor()){
@@ -53,3 +44,4 @@ void arrived_floor(){
     }
 }
 
+*/

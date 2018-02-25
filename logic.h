@@ -1,5 +1,4 @@
-#ifndef __LOGIC_H__
-#define __LOGIC_H__
+
 
 extern int order_matrix[3][4];
 
@@ -31,5 +30,5 @@ void delay(int number_of_seconds);
 
 void set_priority();
 
+void print_current();
 
-#endif 

@@ -1,6 +1,10 @@
 #include "time.h"
 #include "logic.h"
 #include "elev.h"
+#include <stdio.h>
+#include <assert.h>
+#include "channels.h"
+#include "io.h"
 
 //Private variables
 
@@ -56,10 +60,10 @@ int get_last_dir(){
 int check_order(){
 	for (int floor = 0; floor < N_FLOORS; floor++){
 	    for (int button = 0; button <= BUTTON_COMMAND; button++) {
-	        if ((floor == 0 && button == 1) || (floor == 3 && button == 0)) {  //ignoring the undefined button values
-	            break;
-	        }
-	        else if (order_matrix[button][floor] == 0 ){
+	        if (floor == 0 && button == 1) continue;
+	        if (floor == 3 && button == 0) continue;  //ignoring the undefined button values
+
+	        if (order_matrix[button][floor] == 0 ){
 	        	if (elev_get_button_signal(button,floor) == 1){
 	        		order_matrix[button][floor] = 1;
 	        		elev_set_button_lamp(button, floor, 1);
@@ -95,7 +99,7 @@ int check_order_below(){
 		}
 	}
 	for (int floor = 0; floor < get_current_floor(); floor++){
-		if (order_matrix[0][floor]){
+		if (order_matrix[0][floor] == 1){
 			set_next_floor(floor);
 			return 1;
 		}
@@ -105,6 +109,9 @@ int check_order_below(){
 
 void delete_order(int floor){
 	for (int order_type = 0; order_type <= BUTTON_COMMAND; order_type++){
+		if ((floor == 0 && order_type == 1) || (floor == 3 && order_type == 0)) {  //ignoring the undefined button values
+	            break;
+	      	}
 		order_matrix[order_type][floor] = 0;
 		elev_set_button_lamp(order_type, floor, 0);
 	}
@@ -146,4 +153,8 @@ void set_priority(){
 		check_order_below();
 		return;
 	}
+}
+
+void print_current(){
+	printf("Current floor: %d",get_current_floor());
 }
