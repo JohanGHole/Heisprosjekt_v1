@@ -1,13 +1,14 @@
+#ifndef __FSM_H__
+#define __FSM_H__
 // Headerfil til tilstandsmaskinen
 
-* ordrematrise
-* "checkorder"
-* "order_priority"
 
-void init_elevator();
 
-void run_elevator();
+void init_elevator(void);
+
+void elevator_control();
 
 void arrived_floor();
 
-void stop_elevator();
+
+#endif 
