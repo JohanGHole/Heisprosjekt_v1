@@ -32,3 +32,8 @@ void set_priority();
 
 void print_current();
 
+void print_next();
+
+void print_matrix();
+
+int sum_of_orders();

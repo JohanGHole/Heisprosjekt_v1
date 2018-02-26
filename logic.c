@@ -62,12 +62,11 @@ int check_order(){
 	    for (int button = 0; button <= BUTTON_COMMAND; button++) {
 	        if (floor == 0 && button == 1) continue;
 	        if (floor == 3 && button == 0) continue;  //ignoring the undefined button values
-
 	        if (order_matrix[button][floor] == 0 ){
 	        	if (elev_get_button_signal(button,floor) == 1){
 	        		order_matrix[button][floor] = 1;
 	        		elev_set_button_lamp(button, floor, 1);
-	        	return 1;
+	        		return 1;
 	        	}
 	        }
 	    }
@@ -82,10 +81,10 @@ int check_order_above(){
 			return 1;
 		}
 	}
-	for (int floor = N_FLOORS-1; floor > get_current_floor(); floor--){
-		if (order_matrix[1][floor] == 1){
-		set_next_floor(floor);
-		return 1;
+	for (int floor = 3; floor >= 0; floor--){
+		if((order_matrix[1][floor] == 1 || order_matrix[0][floor] == 1 || order_matrix[2][floor])){ //Sjekker for resterende knapper på panelet
+			set_next_floor(floor);
+			return 1;
 		}
 	}
 	return 0;	
@@ -98,8 +97,8 @@ int check_order_below(){
 			return 1;
 		}
 	}
-	for (int floor = 0; floor < get_current_floor(); floor++){
-		if (order_matrix[0][floor] == 1){
+	for (int floor = 0; floor < N_FLOORS; floor++){
+		if((order_matrix[1][floor] == 1 || order_matrix[0][floor] == 1 || order_matrix[2][floor])){ //Sjekker resterende knapper på panelet
 			set_next_floor(floor);
 			return 1;
 		}
@@ -157,4 +156,29 @@ void set_priority(){
 
 void print_current(){
 	printf("Current floor: %d",get_current_floor());
+}
+
+void print_next(){
+	printf("Next floor: %d \n",get_next_floor());
+}
+
+void print_matrix(){
+	printf("\n");
+	for(int i = 0; i < 3; i++){
+		for (int j= 0; j <4; j++){
+			printf(" %d", order_matrix[i][j]);
+		}
+		printf("\n");
+	}
+	printf("\n");
+}
+
+int sum_of_orders(){
+	int sum =0;
+	for(int i = 0; i < 3; i++){
+		for (int j= 0; j <4; j++){
+			sum += order_matrix[i][j];
+		}
+	}
+	return sum;
 }
