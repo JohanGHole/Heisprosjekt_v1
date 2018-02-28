@@ -75,14 +75,14 @@ int check_order(){
 }
 
 int check_order_above(){
-	for (int floor = get_current_floor()+1; floor < N_FLOORS; floor++) {
+	for (int floor = get_current_floor(); floor < N_FLOORS; floor++) {
 		if(order_matrix[0][floor] == 1 || order_matrix[2][floor] == 1)  {
 			set_next_floor(floor);
 			return 1;
 		}
 	}
-	for (int floor = 3; floor >= 0; floor--){
-		if((order_matrix[1][floor] == 1 || order_matrix[0][floor] == 1 || order_matrix[2][floor])){ //Sjekker for resterende knapper på panelet
+	for (int floor = N_FLOORS-1; floor > get_current_floor(); floor--){
+		if(order_matrix[1][floor] == 1){ //Sjekker for resterende knapper på panelet
 			set_next_floor(floor);
 			return 1;
 		}
@@ -91,14 +91,14 @@ int check_order_above(){
 }
 
 int check_order_below(){
-	for (int floor = get_current_floor()-1; floor >= 0; floor--) {
+	for (int floor = get_current_floor(); floor >= 0; floor--) {
 		if(order_matrix[1][floor] == 1 || order_matrix[2][floor] == 1) {
 			set_next_floor(floor);
 			return 1;
 		}
 	}
-	for (int floor = 0; floor < N_FLOORS; floor++){
-		if((order_matrix[1][floor] == 1 || order_matrix[0][floor] == 1 || order_matrix[2][floor])){ //Sjekker resterende knapper på panelet
+	for (int floor = 0; floor < get_current_floor(); floor++){
+		if(order_matrix[0][floor] == 1 ){ //Sjekker resterende knapper på panelet
 			set_next_floor(floor);
 			return 1;
 		}
@@ -108,9 +108,7 @@ int check_order_below(){
 
 void delete_order(int floor){
 	for (int order_type = 0; order_type <= BUTTON_COMMAND; order_type++){
-		if ((floor == 0 && order_type == 1) || (floor == 3 && order_type == 0)) {  //ignoring the undefined button values
-	            break;
-	      	}
+		if ((floor == 0 && order_type == 1) || (floor == 3 && order_type == 0) || floor == -1) continue;
 		order_matrix[order_type][floor] = 0;
 		elev_set_button_lamp(order_type, floor, 0);
 	}
@@ -137,12 +135,22 @@ void set_priority(){
 		return;
 	}
 	else if (get_last_dir() == DIRN_UP && get_current_floor() != 3){
-		check_order_above();
-		return;
+		if (check_order_above()==1){
+			return;
+		}
+		else {
+			check_order_below(); 
+			return;
+		}
 	}
 	else if (get_last_dir() == DIRN_DOWN && get_current_floor() != 0){
-		check_order_below();
+		if (check_order_below()==1){
 		return;
+		}
+		else {
+			check_order_above();
+			return;
+		}
 	}
 	else if (get_current_floor() == 0 && get_current_dir() == DIRN_STOP){
 		check_order_above();

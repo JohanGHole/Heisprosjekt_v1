@@ -4,10 +4,11 @@
 
 
 
-void init_elevator();
+void start();
 
-void elevator_control();
+void move();
 
-void arrived_floor();
+void stop();
+
 
 #endif
